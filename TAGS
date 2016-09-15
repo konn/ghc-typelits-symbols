@@ -1,0 +1,74 @@
+
+./examples/example.hs,117
+module Main Main2,3
+a a8,9
+a a9,10
+caster caster11,12
+caster caster12,13
+main main14,15
+main main15,16
+
+./Setup.hs,15
+main main1,2
+
+./src/GHC/TypeLits/Symbols/Internal.hs,228
+module GHC.TypeLits.Symbols.InternalGHC.TypeLits.Symbols.Internal1,2
+type family family5,6
+data SymbolView SymbolView7,8
+data SymbolView = SymNilSymNil7,8
+                | SymCons SymCons8,9
+type family family10,11
+
+./src/GHC/TypeLits/Symbols/Solver.hs,783
+module GHC.TypeLits.Symbols.SolverGHC.TypeLits.Symbols.Solver2,3
+plugin plugin17,18
+plugin plugin18,19
+deconsPlugin deconsPlugin20,21
+deconsPlugin deconsPlugin21,22
+data MyEnv MyEnv28,29
+data MyEnv = MyEnv MyEnv28,29
+data MyEnv = MyEnv { viewsym viewsym28,29
+                   , append append29,30
+                   , symnil symnil30,31
+                   , symcons symcons31,32
+deconsPluginMain deconsPluginMain35,36
+deconsPluginMain deconsPluginMain36,37
+type Machine Machine49,50
+runMachine runMachine51,52
+runMachine runMachine52,53
+isEmptySym isEmptySym54,55
+isEmptySym isEmptySym55,56
+singletonFS singletonFS58,59
+singletonFS singletonFS59,60
+procCt procCt61,62
+procCt procCt62,63
+simplify simplify72,73
+simplify simplify73,74
+
+./src/GHC/TypeLits/Symbols.hs,674
+module GHC.TypeLits.SymbolsGHC.TypeLits.Symbols6,7
+type family family16,17
+type family Null Null16,17
+type Head Head20,21
+type Head s s20,21
+type family family21,22
+type family Head' Head'21,22
+type Tail Tail24,25
+type family family25,26
+type family Tail' Tail'25,26
+type ToCharList ToCharList28,29
+type ToCharList (s(28,29
+type family family30,31
+type family ToCharList' ToCharList'30,31
+promoteOnly promoteOnly34,35
+type ReadInt ReadInt51,52
+type family family53,54
+type family Recons Recons53,54
+type StripPrefix StripPrefix57,58
+type StripPrefix prf prf57,58
+type family family58,59
+type family StripPrefix' StripPrefix'58,59
+
+./test/Spec.hs,30
+main main0,1
+main main1,2
