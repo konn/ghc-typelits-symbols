@@ -45,15 +45,15 @@ Functions
 Basic supported operations:
 
 * `ViewSymbol`{.haskell}: type-level function to deconstruct the given symbol as below:
-    1. `ViewSymbol "" ~ 'SymNil`{.haskell}
-    2. `ViewSymbol "abc" ~ 'SymCons "a"  "bc"`{.haskell}
-* Type-level appending operator `(+++)`{.haskell}: `"123" +++ "456" ~ "123456"`{.haskell} 
+    1. `ViewSymbol "" ~ 'SymNil`
+    2. `ViewSymbol "abc" ~ 'SymCons "a"  "bc"`
+* Type-level appending operator `(+++)`: `"123" +++ "456" ~ "123456"`
 
 These operations doesn't reduce by GHCi's `:kind!` command, but
-GHC simplifies operations on `Symbol`{.haskell}s defined in terms of `ViewSymbol`{.haskell} and `(+++)`{.haskell} are reduced to simpler form as much as possible in the type-check phase.
+GHC simplifies operations on `Symbol`s defined in terms of `ViewSymbol` and `(+++)` are reduced to simpler form as much as possible in the type-check phase.
 
 This package currently provides the following aux functions defined in terms of aboves:
 
-* `ReadInt`{.haskell}
-* `Head`{.haskell}
-* `Tail`{.haskell}
+* `ReadInt`
+* `Head`
+* `Tail`
