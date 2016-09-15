@@ -49,7 +49,7 @@ Basic supported operations:
     2. `ViewSymbol "abc" ~ 'SymCons "a"  "bc"`
 * Type-level appending operator `(+++)`: `"123" +++ "456" ~ "123456"`
 
-These operations doesn't reduce by GHCi's `:kind!` command, but
+These operations can't be reduced by GHCi's `:kind!` command, but
 GHC simplifies operations on `Symbol`s defined in terms of `ViewSymbol` and `(+++)` are reduced to simpler form as much as possible in the type-check phase.
 
 This package currently provides the following aux functions defined in terms of aboves:
