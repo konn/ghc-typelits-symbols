@@ -4,12 +4,12 @@ module Main where
 import Data.Singletons.Prelude
 import Data.Singletons.Prelude.Maybe
 import GHC.TypeLits.Symbols
+import GHC.TypeLits
 import GHC.TypeLits.Symbols.Internal
 
 a :: (ReadInt "123" ~ 123) => ()
 a = ()
-
-caster :: (ReadInt (FromJust (StripPrefix "x_" "x_2")) ~ 2) => ()
+caster :: (ReadInt (FromJust (StripPrefix "x_" "x_2")) + 1 <= 3) => ()
 caster = ()
 
 main :: IO ()

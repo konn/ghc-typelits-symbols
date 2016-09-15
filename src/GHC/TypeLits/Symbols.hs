@@ -10,7 +10,7 @@ module GHC.TypeLits.Symbols
 import GHC.TypeLits.Symbols.Internal
 
 import Data.Promotion.TH
-import Data.Singletons.Prelude.List (Foldl, Map)
+import Data.Singletons.Prelude.List (Foldl1, Map)
 import Data.Singletons.Prelude.Num
 import Data.Singletons.TypeLits
 
@@ -49,7 +49,7 @@ promoteOnly [d|
   readDigit "9" = 9
  |]
 
-type ReadInt s = Foldl ShiftSym0 0 (Map ReadDigitSym0 (ToCharList s))
+type ReadInt s = Foldl1 ShiftSym0 (Map ReadDigitSym0 (ToCharList s))
 
 type family Recons v where
   Recons 'SymNil = ""

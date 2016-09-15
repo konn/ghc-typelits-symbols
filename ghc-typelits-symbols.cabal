@@ -53,6 +53,20 @@ executable example
   default-language:    Haskell2010
   ghc-options:         -Wall
 
+executable fins
+  if flag(examples)
+    buildable:         True
+  else
+    buildable:         False
+  hs-source-dirs:      examples
+  Main-is:             fins.hs
+  build-depends:       base
+                     , ghc-typelits-symbols
+                     , singletons
+                     , reflection
+  default-language:    Haskell2010
+  ghc-options:         -Wall
+
 source-repository head
   type:     git
   location: https://github.com/konn/ghc-typelits-symbols

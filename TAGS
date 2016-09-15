@@ -1,12 +1,19 @@
 
-./examples/example.hs,117
+./examples/example.hs,119
 module Main Main2,3
-a a8,9
 a a9,10
+a a10,11
 caster caster11,12
-caster caster12,13
+caster caster11,12
 main main14,15
 main main15,16
+
+./examples/fins.hs,102
+module Main Main6,7
+kidding kidding32,33
+kidding kidding32,33
+main main35,36
+main main36,37
 
 ./Setup.hs,15
 main main1,2
@@ -19,7 +26,7 @@ data SymbolView = SymNilSymNil7,8
                 | SymCons SymCons8,9
 type family family10,11
 
-./src/GHC/TypeLits/Symbols/Solver.hs,783
+./src/GHC/TypeLits/Symbols/Solver.hs,833
 module GHC.TypeLits.Symbols.SolverGHC.TypeLits.Symbols.Solver2,3
 plugin plugin17,18
 plugin plugin18,19
@@ -33,17 +40,19 @@ data MyEnv = MyEnv { viewsym viewsym28,29
                    , symcons symcons31,32
 deconsPluginMain deconsPluginMain35,36
 deconsPluginMain deconsPluginMain36,37
-type Machine Machine49,50
-runMachine runMachine51,52
-runMachine runMachine52,53
-isEmptySym isEmptySym54,55
-isEmptySym isEmptySym55,56
-singletonFS singletonFS58,59
-singletonFS singletonFS59,60
-procCt procCt61,62
-procCt procCt62,63
-simplify simplify72,73
-simplify simplify73,74
+genSubst genSubst51,52
+genSubst genSubst52,53
+type Machine Machine56,57
+runMachine runMachine58,59
+runMachine runMachine59,60
+isEmptySym isEmptySym61,62
+isEmptySym isEmptySym62,63
+singletonFS singletonFS65,66
+singletonFS singletonFS66,67
+procCt procCt68,69
+procCt procCt69,70
+simplify simplify75,76
+simplify simplify76,77
 
 ./src/GHC/TypeLits/Symbols.hs,674
 module GHC.TypeLits.SymbolsGHC.TypeLits.Symbols6,7
