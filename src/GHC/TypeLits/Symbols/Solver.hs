@@ -77,8 +77,18 @@ simplify :: Type -> Machine (Maybe Type)
 simplify t = do
   lift $ tcPluginTrace "Simplifying: " $ ppr t
   MyEnv{..} <- ask
-  case splitTyConApp_maybe t  of
-    Just (con, [a0]) | con == viewsym -> do
+  case t of
+    ForAllTy bnds tp -> do
+      fmap (ForAllTy bnds) <$> simplify tp
+    TyVarTy{} -> return Nothing
+    AppTy l r -> do
+      (l', r') <- (,) <$> simplify l <*> simplify r
+      if isJust l' || isJust r'
+        then do
+          lift $ tcPluginTrace "Simplified(AT): " $ ppr (t, AppTy (fromMaybe l l') (fromMaybe r r'))
+          return $ Just $ AppTy (fromMaybe l l') (fromMaybe r r')
+        else lift (tcPluginTrace "Failed! (AT): " (ppr t)) >> return Nothing
+    TyConApp tc [a0] | tc == viewsym -> do
       a' <- simplify a0
       let a = fromMaybe a0 a'
       case a of
@@ -91,7 +101,7 @@ simplify t = do
                          ]
         _ | isJust a' -> return $ Just $ TyConApp viewsym [a]
         _             -> lift (tcPluginTrace "Failed! (view): " (ppr (t, a))) >> return Nothing
-    Just (con, [l0, r0]) | con == append -> do
+    TyConApp tc [l0, r0] | tc == append -> do
       (l', r') <- (,) <$> (simplify l0)
                       <*> (simplify r0)
       let (l, r) = (fromMaybe l0 l', fromMaybe r0 r')
@@ -102,29 +112,11 @@ simplify t = do
            LitTy (StrTyLit rfs) <- r     -> return $ Just $ LitTy $ StrTyLit (appendFS lfs rfs)
          | isJust l' || isJust r'       -> return $ Just $ TyConApp append [l, r]
          | otherwise                    -> lift (tcPluginTrace "Failed! (append): " (ppr (t, (l, r)))) >> return Nothing
-    Just (con, args) -> do
-      as <- mapM simplify args
-      if any isJust as
+    TyConApp tc ars -> do
+      ars' <- mapM simplify ars
+      if any isJust ars'
         then do
-          lift $ tcPluginTrace "Simplified: " $ ppr (t, mkTyConApp con $ zipWith fromMaybe args as)
-          return $ Just $ mkTyConApp con $ zipWith fromMaybe args as
-        else lift (tcPluginTrace "Failed! (splitCon): " (ppr t)) >> return Nothing
-    _ -> case t of
-      TyVarTy{} -> return Nothing
-      AppTy l r -> do
-        (l', r') <- (,) <$> simplify l <*> simplify r
-        if isJust l' || isJust r'
-          then do
-            lift $ tcPluginTrace "Simplified(AT): " $ ppr (t, AppTy (fromMaybe l l') (fromMaybe r r'))
-            return $ Just $ AppTy (fromMaybe l l') (fromMaybe r r')
-          else lift (tcPluginTrace "Failed! (AT): " (ppr t)) >> return Nothing
-      TyConApp tc ars -> do
-        ars' <- mapM simplify ars
-        if any isJust ars'
-          then do
-            lift $ tcPluginTrace "Simplified(TCA): " $ ppr (t, TyConApp tc $ zipWith fromMaybe ars ars')
-            return $ Just $ TyConApp tc $ zipWith fromMaybe ars ars'
-          else lift (tcPluginTrace "Failed! (TCA): " (ppr t)) >> return Nothing
-      ForAllTy bnds tp -> do
-        fmap (ForAllTy bnds) <$> simplify tp
-      _ -> lift (tcPluginTrace "I don't have any idea" $ ppr t) >>return Nothing
+          lift $ tcPluginTrace "Simplified(TCA): " $ ppr (t, TyConApp tc $ zipWith fromMaybe ars ars')
+          return $ Just $ TyConApp tc $ zipWith fromMaybe ars ars'
+        else lift (tcPluginTrace "Failed! (TCA): " (ppr t)) >> return Nothing
+    _ -> lift (tcPluginTrace "I don't have any idea" $ ppr t) >>return Nothing
