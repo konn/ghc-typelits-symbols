@@ -34,7 +34,7 @@ data MyEnv = MyEnv { viewsym :: TyCon
          deriving (Eq, Ord)
 
 deconsPluginMain :: () -> [Ct] -> [Ct] -> [Ct] -> TcPluginM TcPluginResult
-deconsPluginMain _ gs [] [] = return $ TcPluginOk [] []
+deconsPluginMain _ _gs [] [] = return $ TcPluginOk [] []
 deconsPluginMain _ gs ds ws = do
   let subst = foldr unionTCvSubst emptyTCvSubst $ map genSubst (gs ++ ds)
   tcPluginTrace "(givens, deriveds, wanteds) = " $ ppr (gs, ds, map (substTy subst . ctPred) ws)

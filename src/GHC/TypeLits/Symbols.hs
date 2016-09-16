@@ -3,7 +3,7 @@
 {-# LANGUAGE UndecidableInstances                                 #-}
 -- | Use this module with the following options:
 --
---  @{-# GHC_OPTIONS -fplugin GHC.TypeLits.Symbols.Solver #-}@
+--  @{-\# GHC_OPTIONS -fplugin GHC.TypeLits.Symbols.Solver \#-}@
 module GHC.TypeLits.Symbols
        (Symbol, type (+++), Head, Tail, ReadInt,
         ToCharList, ViewSymbol, SymbolView, StripPrefix) where
