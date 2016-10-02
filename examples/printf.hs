@@ -4,6 +4,8 @@
 {-# LANGUAGE TypeInType, TypeOperators, UndecidableInstances, UnicodeSyntax #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Symbols.Solver #-}
 {-# OPTIONS_GHC -fconstraint-solver-iterations=0 #-}
+-- {-# OPTIONS_GHC -ddump-tc-trace #-}
+{-# OPTIONS_GHC -O0 #-} -- I don't know why optimization prevents this program from compiling....
 module Main where
 import Data.Kind
 import Data.Singletons.Prelude
@@ -67,11 +69,8 @@ type ParsePrintf sym = ParsePrintf' ('Normal "") (ViewSymbol sym)
 printf ∷ ∀ sym. (SingI (ParsePrintf sym)) ⇒ Sing sym → Printf (ParsePrintf sym)
 printf _ = printf' @(ParsePrintf sym) [] sing
 
-greeting :: String → String
-greeting = printf @"Hello, %s!" sing
-
 main ∷ IO ()
 main = do
   putStr "put your name: "
   hFlush stdout
-  putStrLn . greeting =<< getLine
+  putStrLn . printf @"Hello, %s!" sing =<< getLine
