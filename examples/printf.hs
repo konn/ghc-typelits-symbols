@@ -1,20 +1,19 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, GADTs, ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell, TypeApplications, TypeFamilies         #-}
-{-# LANGUAGE TypeFamilyDependencies, TypeInType, TypeOperators       #-}
-{-# LANGUAGE UndecidableInstances, UnicodeSyntax                     #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, GADTs, LiberalTypeSynonyms        #-}
+{-# LANGUAGE RankNTypes, ScopedTypeVariables, TemplateHaskell               #-}
+{-# LANGUAGE TypeApplications, TypeFamilies, TypeFamilyDependencies         #-}
+{-# LANGUAGE TypeInType, TypeOperators, UndecidableInstances, UnicodeSyntax #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Symbols.Solver #-}
 {-# OPTIONS_GHC -fconstraint-solver-iterations=0 #-}
--- {-# OPTIONS_GHC -ddump-tc-trace #-}
 module Main where
 import Data.Kind
 import Data.Singletons.Prelude
 import GHC.TypeLits
 import GHC.TypeLits.Symbols
 import GHC.TypeLits.Symbols.Internal
+import System.IO
 
 -- Type-safe printf.
-
-data Format = Lit Symbol | Str | Shown Type
+data Format = Lit Symbol | Str | Shown (★)
 
 data instance Sing (x ∷ Format) where
   SLit   ∷ KnownSymbol s ⇒ Sing s → Sing ('Lit s)
@@ -34,9 +33,9 @@ newtype Showed a = Showed { runShowed :: a }
 
 type family Printf (fmt ∷ [Format])  where
   Printf '[] = String
-  Printf ('Lit s   ': fmt) = Printf fmt
-  Printf ('Str     ': fmt) = String → Printf fmt
-  Printf ('Shown a ': fmt) = a → Printf fmt
+  Printf ('Lit s ': fmt) = Printf fmt
+  Printf ('Str   ': fmt) = String → Printf fmt
+  Printf ('Shown a ': fmt) =  a → Printf fmt
 
 printf' ∷ ∀ fmt. [String] → Sing fmt → Printf fmt
 printf' ss SNil = concat $ reverse ss
@@ -45,29 +44,34 @@ printf' ss (SCons elt elts) = case elt of
   SStr → \ s → printf' (s : ss) elts
   SShown → \x → printf' (show x : ss) elts
 
--- printf ∷ Sing fmt → Printf fmt
--- printf = printf' []
+printf_ ∷ Sing fmt → Printf fmt
+printf_ = printf' []
 
 data ParseState = Percent
                 | Normal Symbol
 
 type family ParsePrintf' (s ∷ ParseState) (a ∷ SymbolView) ∷ [Format] where
-  ParsePrintf' 'Percent 'SymNil = '[ 'Lit "%" ]
-  ParsePrintf' 'Percent ('SymCons "%" a) = ParsePrintf' ('Normal "%") (ViewSymbol a)
-  ParsePrintf' 'Percent ('SymCons "s" a) = 'Str ': ParsePrintf' ('Normal "") (ViewSymbol a)
-  -- ParsePrintf' 'Percent ('SymCons "S" a) = 'Shown t ': ParsePrintf' ('Normal "") (ViewSymbol a)
-  ParsePrintf' ('Normal str) ('SymCons c "") = '[ 'Lit (str +++ c) ]
+  ParsePrintf' 'Percent       'SymNil         = '[ 'Lit "%" ]
+  ParsePrintf' 'Percent      ('SymCons "%" a) = ParsePrintf' ('Normal "%") (ViewSymbol a)
+  ParsePrintf' 'Percent      ('SymCons "s" a) = 'Str ': ParsePrintf' ('Normal "") (ViewSymbol a)
+  -- ParsePrintf' 'Percent      ('SymCons "S" a) = 'Shown Any ': ParsePrintf' ('Normal "") (ViewSymbol a)
+  ParsePrintf' ('Normal str) ('SymCons c "")  = '[ 'Lit (str +++ c) ]
+  ParsePrintf' ('Normal "")  ('SymCons "%" a) = ParsePrintf' 'Percent (ViewSymbol a)
   ParsePrintf' ('Normal str) ('SymCons "%" a) = 'Lit str ': ParsePrintf' 'Percent (ViewSymbol a)
   ParsePrintf' ('Normal str) ('SymCons c a)   = ParsePrintf' ('Normal (str +++ c)) (ViewSymbol a)
-  ParsePrintf' ('Normal str) 'SymNil = '[ 'Lit str ]
+  ParsePrintf' ('Normal "")   'SymNil         = '[]
+  ParsePrintf' ('Normal str)  'SymNil         = '[ 'Lit str ]
 
 type ParsePrintf sym = ParsePrintf' ('Normal "") (ViewSymbol sym)
 
 printf ∷ ∀ sym. (SingI (ParsePrintf sym)) ⇒ Sing sym → Printf (ParsePrintf sym)
 printf _ = printf' @(ParsePrintf sym) [] sing
 
-str ∷ String → String
-str = printf @"Hi, your name is %s!" sing
+greeting :: String → String
+greeting = printf @"Hello, %s!" sing
 
 main ∷ IO ()
-main = putStrLn $ str "foo"
+main = do
+  putStr "put your name: "
+  hFlush stdout
+  putStrLn . greeting =<< getLine

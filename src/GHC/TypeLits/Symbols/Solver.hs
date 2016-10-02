@@ -69,8 +69,19 @@ singletonFS = flip consFS nilFS
 procCt :: TCvSubst -> Ct -> Machine (Maybe ((EvTerm, Ct), CtEvidence))
 procCt subst ct = simplify (substTy subst $ ctPred ct) >>= \case
   Just tp' ->
-    Just . (,) (evByFiat "ghc-typelits-symbols" (ctPred ct) tp', ct)
-               <$> lift (newWanted (ctLoc ct) tp')
+    case classifyPredType tp' of
+      EqPred{} -> do
+        w' <- lift (newWanted (ctLoc ct) tp')
+        return $
+          Just ((evByFiat "ghc-typelits-symbols" (ctPred ct) tp', ct), w')
+      ClassPred {} -> do
+        w' <- lift (newWanted (ctLoc ct) tp')
+        let tm = ctEvTerm w'
+            caster = mkUnivCo (PluginProv "ghc-typelits-symbols")
+                     Nominal tp' (ctPred ct)
+        return $
+          Just ((mkEvCast tm caster, ct), w')
+      IrredPred _pr -> return Nothing
   Nothing -> return Nothing
 
 simplify :: Type -> Machine (Maybe Type)
